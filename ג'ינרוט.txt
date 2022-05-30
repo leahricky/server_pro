@@ -1,1 +1,0 @@
-Scaffold-DbContext "Server=srv2\PUPILS;Database=Hub_Jerusalem;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
