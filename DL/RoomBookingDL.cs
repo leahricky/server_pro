@@ -64,7 +64,7 @@ namespace DL
             //        throw new Exception("asynchronization problem :(");
             //    }
             //}
-            //uituy
+            
 
             Room r = await rd.get(room_booking.IdRoomNavigation.Name);
             room_booking.IdRoom = r.Id;
