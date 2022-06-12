@@ -13,9 +13,11 @@ namespace DL
     {
 
         Hub_JerusalemContext data;
-        public RoomBookingDL(Hub_JerusalemContext data)//, IUserDL u_dl)
+        IRoomDL rd;
+        public RoomBookingDL(Hub_JerusalemContext data,IRoomDL rd)//, IUserDL u_dl)
         {
             this.data = data;
+            this.rd = rd;
         }
 
         public async Task<List<RoomBooking>> get(string id)
@@ -34,8 +36,8 @@ namespace DL
             //((start_dateTime == null) && (x.EndDateTime >= end_dateTime)) ||  //תנאי בשביל קבלת כל ההזמנות הרלוונטיות
             (((x.StartDateTime <= start_dateTime) && (x.EndDateTime >= start_dateTime) )||
             ((x.EndDateTime >= end_dateTime) && (x.StartDateTime <= end_dateTime)) ||
-            ((x.StartDateTime >= start_dateTime) && (x.StartDateTime <= end_dateTime))) &&
-            ((type == 0)||(x.IdRoom == type))).ToListAsync();
+            ((x.StartDateTime >= start_dateTime) && (x.StartDateTime <= end_dateTime)))
+            &&((type == 0)||(x.IdRoomNavigation.IdRoomType == type))).ToListAsync();
 
             /*return await data.RoomBookings.Where(x => (x.StartDateTime >= start_dateTime) && (x.EndDateTime <= end_dateTime) &&
             ((x.StartHour == TimeSpan.Zero) && (x.EndHour == TimeSpan.Zero)) || ((x.StartHour >= start_hour) && (x.EndHour <= end_hour)) &&((type==null)||
@@ -62,6 +64,10 @@ namespace DL
             //        throw new Exception("asynchronization problem :(");
             //    }
             //}
+            //uituy
+
+            Room r = await rd.get(room_booking.IdRoomNavigation.Name);
+            room_booking.IdRoom = r.Id;
             await data.RoomBookings.AddAsync(room_booking);
             await data.SaveChangesAsync();
          
@@ -94,18 +100,14 @@ namespace DL
             }
         }
 
-        public async Task delete(int id)
+        public async Task delete(string idNumber)
         {
-            RoomBooking rb = await data.RoomBookings.FindAsync(id);
-            if (rb != null)
+            List<RoomBooking> rbs = await data.RoomBookings.Where(x=>x.IdUser==idNumber).ToListAsync();
+            foreach (RoomBooking rb in rbs)
             {
                 data.RoomBookings.Remove(rb);
                 await data.SaveChangesAsync();
             }
-            else
-                throw new Exception("not found:(");
         }
-
-
     }
 }

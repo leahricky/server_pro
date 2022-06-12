@@ -16,6 +16,6 @@ namespace BL
         Task<int> post(RoomBooking room_booking_dto);
         Task put(RoomBooking room_booking_dto);
         Task put(List<RoomBooking> room_bookings);
-        Task delete(int id);
+        Task delete(string idNumber);
     }
 }

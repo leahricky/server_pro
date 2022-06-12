@@ -24,17 +24,17 @@ namespace DL
 
         public async Task<Room> get(string name)
         {
-            return data.Rooms.SingleOrDefault(x => x.Name==name);
+            return await data.Rooms.SingleOrDefaultAsync(x => x.Name== name);
         }
 
-        public async Task<List<Room>> get2(string room_type)
+        public async Task<List<Room>> get2(int IdRoomType)
         {
-            return await data.Rooms.Where(x => (x.Active==true)&&(x.IdRoomTypeNavigation.RoomType1 == room_type)).ToListAsync();
+            return await data.Rooms.Where(x => (x.Active==true)&&(x.IdRoomTypeNavigation.Id == IdRoomType)).ToListAsync();
         }
 
         public async Task put(Room room)
         {
-            Room r = data.Rooms.Single(x => x.Name == room.Name);
+            Room r = await data.Rooms.SingleOrDefaultAsync(x => x.Name == room.Name);
             if (r == null)
                 throw new Exception("room to change not found:(");
             else

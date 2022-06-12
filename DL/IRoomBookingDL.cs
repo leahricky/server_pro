@@ -16,6 +16,6 @@ namespace DL
         Task<int> post(RoomBooking room_booking);
         Task put(RoomBooking room_booking);
         Task put(List<RoomBooking> room_bookings);
-        Task delete(int id);
+        Task delete(string idNumber);
     }
 }

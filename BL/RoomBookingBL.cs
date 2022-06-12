@@ -46,9 +46,9 @@ namespace BL
             await iroomBooking.put(room_bookings);
         }
         
-        public async Task delete(int id)
+        public async Task delete(string idNumber)
         {
-            await iroomBooking.delete(id);
+            await iroomBooking.delete(idNumber);
         }
 
     }

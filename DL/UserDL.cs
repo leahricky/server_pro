@@ -80,6 +80,7 @@ namespace DL
             {
                 user.IdNumber = u.IdNumber;
                 user.Id = u.Id;
+
                 data.Entry(u).CurrentValues.SetValues(user);
                 await data.SaveChangesAsync(); 
             }

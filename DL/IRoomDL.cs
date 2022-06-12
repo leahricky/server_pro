@@ -11,7 +11,7 @@ namespace DL
     {
         Task<List<Room>> get();
         Task<Room> get(string name);
-        Task<List<Room>> get2(string room_type);
+        Task<List<Room>> get2(int IdRoomType);
         Task put(Room room);
         Task post(Room room);
 

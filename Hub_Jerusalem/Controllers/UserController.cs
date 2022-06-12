@@ -19,6 +19,11 @@ namespace Hub_Jerusalem.Controllers
         IUserBL ubl;
         IMapper _mapper;
         ILogger<UserController> logger;
+        /*        Dictionary<int, string> working= new Dictionary<int, string>();*/
+        Dictionary<string, int> wStatus = new Dictionary<string, int>() { { "שכירה" ,18 },{"עצמאית" , 19},{ "פרילנסרית" ,20} };
+        Dictionary<string, int> mStatus = new Dictionary<string, int>() { { "נשואה" ,13 }, { "רווקה" ,14} };
+
+
         public UserController(IUserBL ubl, IMapper _mapper,ILogger<UserController> logger)
         {
             this.ubl = ubl;
@@ -55,6 +60,8 @@ namespace Hub_Jerusalem.Controllers
         public async Task PostAsync([FromBody] UserDTO user)
         {
             User u = _mapper.Map<UserDTO, User>(user);
+            u.IdMarriageStatus = mStatus[user.MarriageStatus];
+            u.IdWorkingStatus = wStatus[user.WorkingStatus];
             await ubl.post(u);
         }
 
@@ -63,6 +70,8 @@ namespace Hub_Jerusalem.Controllers
         public async Task PutAsync([FromBody] UserDTO user)
         {
             User u = _mapper.Map<UserDTO, User>(user);
+            u.IdMarriageStatus = mStatus[user.MarriageStatus];
+            u.IdWorkingStatus = wStatus[user.WorkingStatus];
             await ubl.put(u);
         }
 

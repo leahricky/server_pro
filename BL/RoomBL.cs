@@ -26,9 +26,9 @@ namespace BL
             return await rdl.get(name);
         }
 
-        public async Task<List<Room>> get2(string room_type)
+        public async Task<List<Room>> get2(int IdRoomType)
         {
-            return await rdl.get2(room_type);
+            return await rdl.get2(IdRoomType);
         }
 
         public async Task post(Room room)
