@@ -20,13 +20,13 @@ namespace BL
             this.iroomBooking = iroomBooking;           
         }
 
-        public async Task<List<RoomBooking>> get(string id)
+        public async Task<List<FullRoomBookingDTO>> get(string id)
         {
             return await iroomBooking.get(id);
         }
 
         //getRoomByParanetrs מקבל טווח תאריכים
-        public async Task<List<RoomBooking>> get(int type, DateTime start_dateTime, DateTime end_dateTime)
+        public async Task<List<FullRoomBookingDTO>> get(int type, DateTime start_dateTime, DateTime end_dateTime)
         {
             return await iroomBooking.get(type, start_dateTime, end_dateTime);
         }

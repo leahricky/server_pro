@@ -9,40 +9,89 @@ using System.Threading.Tasks;
 
 namespace DL
 {
-    public class RoomBookingDL:IRoomBookingDL
+    public class RoomBookingDL : IRoomBookingDL
     {
 
         Hub_JerusalemContext data;
         IRoomDL rd;
-        public RoomBookingDL(Hub_JerusalemContext data,IRoomDL rd)//, IUserDL u_dl)
+        
+        public RoomBookingDL(Hub_JerusalemContext data, IRoomDL rd)//, IUserDL u_dl)
         {
             this.data = data;
             this.rd = rd;
         }
 
-        public async Task<List<RoomBooking>> get(string id)
+        public async Task<List<FullRoomBookingDTO>> get(string id)
         {
-            return await data.RoomBookings.Include(rb=> rb.IdRoomNavigation)
+            var group = await data.RoomBookings.Include(rb => rb.IdRoomNavigation)
                 .Where(x => x.IdUser == id && x.EndDateTime >= DateTime.Now)
                 //.Include(u=>u.IdUserNavigation)
                 .ToListAsync();
+
+            var roomsGroup = group.GroupBy(rb => rb.IdRoomNavigation.Name);
+
+            List<FullRoomBookingDTO> roomBookings = new List<FullRoomBookingDTO>();
+
+            foreach (var room in roomsGroup)
+            {
+                var dates = room.GroupBy(r => new { sd = r.StartDateTime.Date, ed = r.EndDateTime.Date, user = r.IdUser });
+                var days = dates.Select(date => new FullRoomBookingDTO
+                {
+                    RoomName = room.Key,
+                    StartDate = date.Key.sd,
+                    EndDate = date.Key.ed,
+                    IdUser = date.Key.user,
+                    Days = date.Select(day => new DayRoomBookingDTO { Day = day.DayRoomBookings.FirstOrDefault().Day, StartTime = day.StartDateTime, EndTime = day.EndDateTime }).ToList()
+                });
+                roomBookings.AddRange(days);
+            }
+            return roomBookings;
         }
 
         //getRoomByParanetrs מקבל טווח תאריכים
         //אפשר לחזור ולקצר את התנאים לכשיזדמןןןןןןןןןן
-        public async Task<List<RoomBooking>> get(int type, DateTime start_dateTime, DateTime end_dateTime)//, TimeSpan start_hour, TimeSpan end_hour)
+        //לשנות תארית התחלה
+        public async Task<List<FullRoomBookingDTO>> get(int type, DateTime start_dateTime, DateTime end_dateTime)//, TimeSpan start_hour, TimeSpan end_hour)
         {
-            return await data.RoomBookings.Include(rb => rb.IdRoomNavigation).Where(x =>
-            //((start_dateTime == null) && (x.EndDateTime >= end_dateTime)) ||  //תנאי בשביל קבלת כל ההזמנות הרלוונטיות
-            (((x.StartDateTime <= start_dateTime) && (x.EndDateTime >= start_dateTime) )||
-            ((x.EndDateTime >= end_dateTime) && (x.StartDateTime <= end_dateTime)) ||
-            ((x.StartDateTime >= start_dateTime) && (x.StartDateTime <= end_dateTime)))
-            &&((type == 0)||(x.IdRoomNavigation.IdRoomType == type))).ToListAsync();
+            var group = await data.RoomBookings.Include(rb => rb.IdRoomNavigation).Include(rb=>rb.DayRoomBookings).Where(x =>
+              ((start_dateTime == DateTime.Now.Date) && (x.EndDateTime >= end_dateTime)) ||  //  תנאי בשביל קבלת כל ההזמנות הרלוונטיות
+              (((x.StartDateTime <= start_dateTime) && (x.EndDateTime >= start_dateTime)) ||
+              ((x.EndDateTime >= end_dateTime) && (x.StartDateTime <= end_dateTime)) ||
+              ((x.StartDateTime >= start_dateTime) && (x.StartDateTime <= end_dateTime)))
+              && ((type == 0) || (x.IdRoomNavigation.IdRoomType == type))).ToListAsync();
+              var roomsGroup = group.GroupBy(rb => rb.IdRoomNavigation.Name);
 
-            /*return await data.RoomBookings.Where(x => (x.StartDateTime >= start_dateTime) && (x.EndDateTime <= end_dateTime) &&
-            ((x.StartHour == TimeSpan.Zero) && (x.EndHour == TimeSpan.Zero)) || ((x.StartHour >= start_hour) && (x.EndHour <= end_hour)) &&((type==null)||
-            (x.IdRoomNavigation.IdRoomTypeNavigation.RoomType1 == type))).ToListAsync();*/
+            List<FullRoomBookingDTO> roomBookings = new List<FullRoomBookingDTO>();
+
+            foreach (var room in roomsGroup)
+            {
+                var dates = room.GroupBy(r => new{
+                    sd = r.StartDateTime.Date ,
+                    ed = r.EndDateTime.Date ,
+                    user = r.IdUser });
+                var days = dates.Select(date => new FullRoomBookingDTO
+                {
+                    RoomName = room.Key,
+                    StartDate = date.Key.sd,
+                    EndDate = date.Key.ed,
+                    IdUser = date.Key.user,
+                    Days = date.Select(day => new DayRoomBookingDTO
+                    {
+                        Day = day.DayRoomBookings.FirstOrDefault().Day,
+                        StartTime = day.StartDateTime,
+                        EndTime = day.EndDateTime
+                    }).ToList()
+
+                }) ;
+                roomBookings.AddRange(days);
+            }
+            return roomBookings;
         }
+
+        /*return await data.RoomBookings.Where(x => (x.StartDateTime >= start_dateTime) && (x.EndDateTime <= end_dateTime) &&
+        ((x.StartHour == TimeSpan.Zero) && (x.EndHour == TimeSpan.Zero)) || ((x.StartHour >= start_hour) && (x.EndHour <= end_hour)) &&((type==null)||
+        (x.IdRoomNavigation.IdRoomTypeNavigation.RoomType1 == type))).ToListAsync();*/
+    
 
         public async Task<int> post(RoomBooking room_booking)
         {
@@ -64,13 +113,14 @@ namespace DL
             //        throw new Exception("asynchronization problem :(");
             //    }
             //}
-            
 
-            Room r = await rd.get(room_booking.IdRoomNavigation.Name);
+            Room r = await rd.get(room_booking.IdRoomNavigation.Name.Trim());
+
             room_booking.IdRoom = r.Id;
+            room_booking.IdRoomNavigation = r;
             await data.RoomBookings.AddAsync(room_booking);
             await data.SaveChangesAsync();
-         
+
             return room_booking.Id;
         }
 
@@ -89,7 +139,7 @@ namespace DL
             //}
             RoomBooking rb = data.RoomBookings.Single(x => x.Id == room_booking.Id);
             data.Entry(rb).CurrentValues.SetValues(room_booking);
-            await data.SaveChangesAsync();  
+            await data.SaveChangesAsync();
         }
 
         public async Task put(List<RoomBooking> room_bookings)
@@ -102,11 +152,17 @@ namespace DL
 
         public async Task delete(string idNumber)
         {
-            List<RoomBooking> rbs = await data.RoomBookings.Where(x=>x.IdUser==idNumber).ToListAsync();
+            List<RoomBooking> rbs = await data.RoomBookings.Where(x => x.IdUser == idNumber).ToListAsync();
             foreach (RoomBooking rb in rbs)
             {
-                data.RoomBookings.Remove(rb);
-                await data.SaveChangesAsync();
+                 DayRoomBooking drb = await data.DayRoomBookings.SingleOrDefaultAsync(x => x.IdRoomBooking == rb.Id);
+                if(drb!= null) { 
+                    data.DayRoomBookings.Remove(drb);
+                    await data.SaveChangesAsync();
+                    data.RoomBookings.Remove(rb);
+                    await data.SaveChangesAsync();
+                }
+
             }
         }
     }

@@ -26,20 +26,20 @@ namespace Hub_Jerusalem.Controllers
 
         // GET api/<RoomBookingController>/5
         [HttpGet("{id}")]
-        public async Task<List<RoomBookingDTO>> GetAsync(string id)
+        public async Task<List<FullRoomBookingDTO>> GetAsync(string id)
         {
-            List <RoomBooking> list_rb= await roomb_bl.get(id);
-            List<RoomBookingDTO> list_rb_DTO = mapper.Map<List<RoomBooking>, List<RoomBookingDTO>>(list_rb);
-            return list_rb_DTO;
+            List <FullRoomBookingDTO> list_rb= await roomb_bl.get(id);
+            //List<RoomBookingDTO> list_rb_DTO = mapper.Map<List<RoomBooking>, List<RoomBookingDTO>>(list_rb);
+            return list_rb;
         }
 
         //POST api/<RoomBookingController>/5
         [HttpGet("{type}/{start_dateTime}/{end_dateTime}")]
-        public async Task<List<RoomBookingDTO>> GetAsync( int type, DateTime start_dateTime, DateTime end_dateTime)//,  TimeSpan start_hour, TimeSpan end_hour)
+        public async Task<List<FullRoomBookingDTO>> GetAsync( int type, DateTime start_dateTime, DateTime end_dateTime)//,  TimeSpan start_hour, TimeSpan end_hour)
         {
-            List<RoomBooking> list_rb = await roomb_bl.get(type, start_dateTime, end_dateTime);//, start_hour, end_hour);
-            List<RoomBookingDTO> list_rb_DTO = mapper.Map<List<RoomBooking>, List<RoomBookingDTO>>(list_rb);
-            return list_rb_DTO;
+            List<FullRoomBookingDTO> list_rb = await roomb_bl.get(type, start_dateTime, end_dateTime);//, start_hour, end_hour);
+            //List<RoomBookingDTO> list_rb_DTO = mapper.Map<List<RoomBooking>, List<RoomBookingDTO>>(list_rb);
+            return list_rb;
         }
 
         // POST api/<RoomBookingController>

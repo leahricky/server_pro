@@ -1,4 +1,5 @@
-﻿using Entity;
+﻿using DTO;
+using Entity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace DL
         public async Task<List<User>> get(DateTime sd, DateTime ed)
         {
             //TimeSpan t = TimeSpan.Zero;
-            List<RoomBooking> rbl = await rb_dl.get(0, sd, ed);
+            List<FullRoomBookingDTO> rbl = await rb_dl.get(0, sd, ed);
             List<User> lu = new List<User>();
             User u;
             foreach (var l in rbl)
