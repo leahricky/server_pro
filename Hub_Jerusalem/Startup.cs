@@ -47,9 +47,6 @@ namespace Hub_Jerusalem
             services.AddScoped<IRatingDL, RatingDL>();
             services.AddScoped<IRatingBL, RatingBL>();
 
-            services.AddScoped<IDayRoomBookingDL, DayRoomBookingDL>();
-            services.AddScoped<IDayRoomBookingBL, DayRoomBookingBL>();
-
             services.AddDbContext<Hub_JerusalemContext>(Options=>Options.UseSqlServer(Configuration.GetConnectionString("HubJerusalem")));
             services.AddAutoMapper(typeof(Startup));
             services.AddSwaggerGen(c =>

@@ -11,11 +11,12 @@ namespace DL
     public interface IRoomBookingDL
     {
         Task<List<FullRoomBookingDTO>> get(string id);
+
         //getRoomByParanetrs מקבל טווח תאריכים
         Task<List<FullRoomBookingDTO>> get(int type, DateTime start_dateTime, DateTime end_dateTime);//, TimeSpan start_hour, TimeSpan end_hour);
-        Task<int> post(RoomBooking room_booking);
+        Task post(List<RoomBooking> room_bookings,string rName);
         Task put(RoomBooking room_booking);
         Task put(List<RoomBooking> room_bookings);
-        Task delete(string idNumber);
+        Task delete(List<int> ids);
     }
 }

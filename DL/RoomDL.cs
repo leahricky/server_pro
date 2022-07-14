@@ -24,7 +24,7 @@ namespace DL
 
         public async Task<Room> get(string name)
         {
-            return await data.Rooms.SingleOrDefaultAsync(x => x.Name== name);
+            return await data.Rooms.FirstOrDefaultAsync(x => x.Name.Trim() == name);
         }
 
         public async Task<List<Room>> get2(int IdRoomType)

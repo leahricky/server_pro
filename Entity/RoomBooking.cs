@@ -9,7 +9,7 @@ namespace Entity
     {
         public RoomBooking()
         {
-            DayRoomBookings = new HashSet<DayRoomBooking>();
+           
         }
 
         public int Id { get; set; }
@@ -18,10 +18,10 @@ namespace Entity
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
         public int TimeDeviation { get; set; }
-        public int Constancy { get; set; }
+       // public int Constancy { get; set; }
+        public int Day { get; set; }
 
         public virtual Room IdRoomNavigation { get; set; }
         public virtual User IdUserNavigation { get; set; }
-        public virtual ICollection<DayRoomBooking> DayRoomBookings { get; set; }
     }
 }

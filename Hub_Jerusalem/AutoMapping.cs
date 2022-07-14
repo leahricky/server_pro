@@ -25,8 +25,8 @@ namespace Hub_Jerusalem
                 .ReverseMap();
 
             CreateMap<RoomBooking, RoomBookingDTO>()
-            .ForMember(dest => dest.RoomName, opts => opts
-                .MapFrom(src => src.IdRoomNavigation.Name))
+            //.ForMember(dest => dest.RoomName, opts => opts
+            //    .MapFrom(src => src.IdRoomNavigation.Name))
             .ReverseMap();//אולי הבעיה ברוורס כי זה רשימה צריך להכניס אחד אחד
 
           /*  CreateMap<RoomBookingDTO, RoomBooking>()

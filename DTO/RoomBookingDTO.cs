@@ -17,5 +17,8 @@ namespace DTO
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
         public int TimeDeviation { get; set; }
+        public int Day { get; set; }
+
+
     }
 }

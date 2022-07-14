@@ -44,18 +44,20 @@ namespace Hub_Jerusalem.Controllers
 
         // POST api/<RoomBookingController>
         [HttpPost]
-        public async Task<int> PostAsync([FromBody] RoomBookingDTO room_booking)
+        public async Task PostAsync([FromBody] List<RoomBookingDTO> room_bookings)
         {
-            RoomBooking rb = mapper.Map<RoomBookingDTO, RoomBooking>(room_booking);
-            return await roomb_bl.post(rb);
+            List<RoomBooking> rbs=new List<RoomBooking>();
+            foreach (RoomBookingDTO rb in room_bookings)
+            {
+                rbs.Add(mapper.Map<RoomBookingDTO, RoomBooking>(rb));
+            }
+            await roomb_bl.post(rbs,room_bookings[room_bookings.Count-1].RoomName.Trim());
         }
     
-
         // PUT api/<RoomBookingController>/5
         [HttpPut]
         public async Task PutAsync([FromBody] RoomBookingDTO room_booking)
         {
-
             RoomBooking rb = mapper.Map<RoomBookingDTO, RoomBooking>(room_booking);
             await roomb_bl.put(rb);                          
         }
@@ -70,9 +72,9 @@ namespace Hub_Jerusalem.Controllers
 
         // DELETE api/<RoomBookingController>/5
         [HttpDelete("{idNumber}")]
-        public async Task DeleteAsync(string idNumber)
+        public async Task DeleteAsync(List<int> ids)
         {
-            await roomb_bl.delete(idNumber);
+            await roomb_bl.delete(ids);
         }
     }
 }

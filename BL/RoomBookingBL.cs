@@ -31,9 +31,9 @@ namespace BL
             return await iroomBooking.get(type, start_dateTime, end_dateTime);
         }
 
-        public async Task<int> post(RoomBooking room_booking)
+        public async Task post(List<RoomBooking> room_bookings,string rName)
         {
-            return await iroomBooking.post(room_booking);
+             await iroomBooking.post(room_bookings, rName);
         }
 
         public async Task put(RoomBooking room_booking)
@@ -46,9 +46,9 @@ namespace BL
             await iroomBooking.put(room_bookings);
         }
         
-        public async Task delete(string idNumber)
+        public async Task delete(List<int> ids)
         {
-            await iroomBooking.delete(idNumber);
+            await iroomBooking.delete(ids);
         }
 
     }

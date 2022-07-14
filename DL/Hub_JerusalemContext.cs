@@ -16,7 +16,7 @@ namespace Entity {
         {
         }
 
-        public virtual DbSet<DayRoomBooking> DayRoomBookings { get; set; }
+       // public virtual DbSet<DayRoomBooking> DayRoomBookings { get; set; }
         public virtual DbSet<MarriageStatus> MarriageStatuses { get; set; }
         public virtual DbSet<Rating> Ratings { get; set; }
         public virtual DbSet<Room> Rooms { get; set; }
@@ -38,18 +38,18 @@ namespace Entity {
         {
             modelBuilder.HasAnnotation("Relational:Collation", "Hebrew_CI_AS");
 
-            modelBuilder.Entity<DayRoomBooking>(entity =>
-            {
-                entity.ToTable("Day_Room_booking");
+            //modelBuilder.Entity<DayRoomBooking>(entity =>
+            //{
+            //    entity.ToTable("Day_Room_booking");
 
-                entity.Property(e => e.IdRoomBooking).HasColumnName("Id_Room_booking");
+            //    entity.Property(e => e.IdRoomBooking).HasColumnName("Id_Room_booking");
 
-                entity.HasOne(d => d.IdRoomBookingNavigation)
-                    .WithMany(p => p.DayRoomBookings)
-                    .HasForeignKey(d => d.IdRoomBooking)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Day_Room_booking_Room_booking");
-            });
+            //    entity.HasOne(d => d.IdRoomBookingNavigation)
+            //        .WithMany(p => p.DayRoomBookings)
+            //        .HasForeignKey(d => d.IdRoomBooking)
+            //        .OnDelete(DeleteBehavior.ClientSetNull)
+            //        .HasConstraintName("FK_Day_Room_booking_Room_booking");
+            //});
 
             modelBuilder.Entity<MarriageStatus>(entity =>
             {
@@ -142,6 +142,10 @@ namespace Entity {
                 entity.Property(e => e.TimeDeviation)
                     .HasColumnName("Time_deviation")
                     .HasDefaultValueSql("((15))");
+
+                entity.Property(e => e.Day)
+                     .HasColumnType("int")
+                     .HasColumnName("Day");
 
                 entity.HasOne(d => d.IdRoomNavigation)
                     .WithMany(p => p.RoomBookings)
