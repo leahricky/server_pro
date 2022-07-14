@@ -51,6 +51,16 @@ namespace DL
         //getRoomByParanetrs מקבל טווח תאריכים
         //אפשר לחזור ולקצר את התנאים לכשיזדמןןןןןןןןןן
         //לשנות תארית התחלה
+
+        public async Task<List<RoomBooking>> sinchrun(int type, DateTime start_dateTime, DateTime end_dateTime)
+        {
+            return await data.RoomBookings.Include(rb => rb.IdRoomNavigation).Include(rb => rb.DayRoomBookings).Where(x =>
+              ((start_dateTime == DateTime.Now.Date) && (x.EndDateTime >= end_dateTime)) ||  //  תנאי בשביל קבלת כל ההזמנות הרלוונטיות
+              (((x.StartDateTime <= start_dateTime) && (x.EndDateTime >= start_dateTime)) ||
+              ((x.EndDateTime >= end_dateTime) && (x.StartDateTime <= end_dateTime)) ||
+              ((x.StartDateTime >= start_dateTime) && (x.StartDateTime <= end_dateTime)))
+              && ((type == 0) || (x.IdRoomNavigation.IdRoomType == type))).ToListAsync();
+        }
         public async Task<List<FullRoomBookingDTO>> get(int type, DateTime start_dateTime, DateTime end_dateTime)//, TimeSpan start_hour, TimeSpan end_hour)
         {
             var group = await data.RoomBookings.Include(rb => rb.IdRoomNavigation).Include(rb=>rb.DayRoomBookings).Where(x =>
@@ -59,6 +69,8 @@ namespace DL
               ((x.EndDateTime >= end_dateTime) && (x.StartDateTime <= end_dateTime)) ||
               ((x.StartDateTime >= start_dateTime) && (x.StartDateTime <= end_dateTime)))
               && ((type == 0) || (x.IdRoomNavigation.IdRoomType == type))).ToListAsync();
+
+            
               var roomsGroup = group.GroupBy(rb => rb.IdRoomNavigation.Name);
 
             List<FullRoomBookingDTO> roomBookings = new List<FullRoomBookingDTO>();
@@ -113,15 +125,38 @@ namespace DL
             //        throw new Exception("asynchronization problem :(");
             //    }
             //}
+            //Room r = await rd.get(room_booking.IdRoomNavigation.Name.Trim());
 
-            Room r = await rd.get(room_booking.IdRoomNavigation.Name.Trim());
-
+            Room r = await rd.get(room_booking.IdRoomNavigation.Name);
             room_booking.IdRoom = r.Id;
             room_booking.IdRoomNavigation = r;
-            await data.RoomBookings.AddAsync(room_booking);
+
+
+            //סנכרון הזמנות
+            //צריך לקרוא לפונקציה גט של הגרופ ביי-  בעיה צריך לפתור!!
+            if (r.Id==room_booking.IdRoom)
+            {
+
+                //במקום זה לקרוא לפונקצית הסנכרון, ואז לבדוק
+               List<RoomBooking> rbs= await data.RoomBookings.Include(rb => rb.IdRoomNavigation).Include(rb => rb.DayRoomBookings).Where(x =>
+                 //  תנאי בשביל קבלת כל ההזמנות הרלוונטיות
+              (((x.StartDateTime <= room_booking.StartDateTime) && (x.EndDateTime >= room_booking.StartDateTime)) ||
+              ((x.EndDateTime >= room_booking.EndDateTime) && (x.StartDateTime <= room_booking.EndDateTime)) ||
+              ((x.StartDateTime >= room_booking.StartDateTime) && (x.StartDateTime <= room_booking.EndDateTime)))
+              ).ToListAsync();
+                if(rbs.Count==0)
+                {
+                    await data.RoomBookings.AddAsync(room_booking);
+                    await data.SaveChangesAsync();
+
+                    return room_booking.Id;
+                }
+            }
+            return - 1;
+            /*await data.RoomBookings.AddAsync(room_booking);
             await data.SaveChangesAsync();
 
-            return room_booking.Id;
+            return room_booking.Id;*/
         }
 
         public async Task put(RoomBooking room_booking)
